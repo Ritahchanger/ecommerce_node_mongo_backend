@@ -32,3 +32,14 @@ const users=[
         password:"13324444"
     }
 ]
+
+
+const testProduct = [
+    {
+      name: "Sadans",
+      description:
+        "They are renowned for their luxurious amenities, comfort, and refined driving experience. Sedans typically prioritize comfort and practicality, making them popular choices for daily commuting, family transportation, and executive travel.",
+      price: "3.56",
+      category: "Mercedez Benz",
+    },
+  ];
