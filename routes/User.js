@@ -1,59 +1,67 @@
 const express = require("express");
-const User = require('../models/users.model');
+const User = require("../models/users.model");
 const router = express.Router();
 
-const users=[
-    {
-        firstName:"Dennis",
-        lastName:"Peter",
-        username:"Ritahchanger",
-        email:"dennispeter2580@gmail.com",
-        idNo:"12345678",
-        password:"2580Mboi"
-    },
-    {
-        firstName:"Mutunga",
-        lastName:"Kelvin",
-        username:"kelvinchanger",
-        email:"kelvinmunyao2580@gmail.com",
-        idNo:"12345678",
-        password:"234543521"
-    },
-    {
-        firstName:"Gibson",
-        lastName:"Daniel",
-        username:"gibson@34",
-        email:"gibson@gmail.com",
-        idNo:"12345678",
-        password:"234543521"
-    },
-    {
-        firstName:"Lucy",
-        lastName:"Mutunga",
-        username:"lucymutuli",
-        email:"lucy@gmail.com",
-        idNo:"2345123",
-        password:"13324444"
-    }
-]
+router.get("/get_users", async (req, res) => {
+  try {
 
-router.get('/get_users',(req,res)=>{
+    const {filter,value}=req.query;
+    const users=await User.find({});
+    if(!filter || !value){
+        return res.status(200).send(users);
+    }else{
+        const filteredUsers=users.filter(user=>{
+            return user[filter] && user[filter].toLowerCase().includes(value.toLowerCase);
+        });
+
+        return res.status(200).send(filteredUsers);
+    }
+
+  } catch (error) {
+    res.status(400).json({ msg: `${error.message}` });
+  }
+});
+
+
+router.post("/post_users", async (req, res) => {
+    try {
+      const { firstName, lastname, username, email, idNo, password } = req.body;
+      const emailFound = await User.findOne({ email });
+      const usernameFound = await User.findOne({ username });
+      const idNoFound = await User.findOne({ idNo });
+      if (emailFound || usernameFound || idNoFound) {
+        return res.status(400).json({
+          msg: "User not created",
+          emailFound: !!emailFound,
+          usernameFound: !!usernameFound,
+          idNoFound: !!idNoFound
+        });
+      } else {
+        const newUser=await User.create(req.body);
+        return res.status(200).json({
+            msg:"The user is successfully registered"
+        })
+      }
+    } catch (error) {
+      res.status(500).json({ msg: "Something went wrong with your server" });
+    }
+  });
+
+
+  router.delete("/delete_users/:id",async (req,res)=>{
+    const { id } = req.params;
     try{
-        console.log("{msg:user found}");
-        res.status(200).send(users);
+        const deleteUser=await User.findByIdAndDelete(id);
+        if(!deleteUser){
+            return res.status(404).json({msg:"User not found"});
+        }else{
+            return res.status(200).json({
+                msg:"User deleted successfully"
+            })
+        }
     }catch(error){
-        res.status(400).json({msg:`${error.message}`});
+        res.status(404).json({msg:`${error.message}`});
     }
-})
-router.post('/post_users',async(req,res)=>{
-    
-})
-
-
-
-
-
-
-
+  })
 
 module.exports = router;
