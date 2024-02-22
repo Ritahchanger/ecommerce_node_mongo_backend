@@ -11,9 +11,8 @@ router.get("/get_users", async (req, res) => {
         return res.status(200).send(users);
     }else{
         const filteredUsers=users.filter(user=>{
-            return user[filter] && user[filter].toLowerCase().includes(value.toLowerCase);
+            return user[filter] && user[filter].toLowerCase().includes(value.toLowerCase());
         });
-
         return res.status(200).send(filteredUsers);
     }
 
@@ -63,5 +62,37 @@ router.post("/post_users", async (req, res) => {
         res.status(404).json({msg:`${error.message}`});
     }
   })
+
+  router.put("/update_user/:user_name", async (req, res) => {
+    try {
+      const { user_name } = req.params;
+      const { firstName, lastName, email, idNo, password } = req.body;
+      const allowedUpdates = { firstName, lastName, email, idNo, password };
+      const updates = Object.keys(allowedUpdates).reduce((obj, key) => {
+        if (allowedUpdates[key] !== undefined) {
+          obj[key] = allowedUpdates[key];
+        }
+        return obj;
+      }, {});
+
+      const user = await User.findOne({ username: user_name });
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+      const updatedUser = await User.findOneAndUpdate(
+        { username: user_name },
+        updates,
+        { new: true }
+      );
+  
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+  });
+  
+  
+
 
 module.exports = router;
