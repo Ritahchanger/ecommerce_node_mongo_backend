@@ -1,19 +1,18 @@
-const mongoose = required("mongoose");
+const mongoose = require("mongoose");
 
-const validCategories = ['Mercedez Benz','BMW','Audi','Lexus','Tesla'];
+const validCategories = ['Mercedez Benz', 'BMW', 'Audi', 'Lexus', 'Tesla'];
 
 const categorySchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true,
-        enum:validCategories,
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        enum: validCategories,
     },
-    description:{
-        type:String,
+    description: {
+        type: String,
     }
-})
+});
+const Category = mongoose.model('Category', categorySchema);
 
-const Category = mongoose.Schema('Category',categorySchema);
-
-module.exports=Category;
+module.exports = Category;
